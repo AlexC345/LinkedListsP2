@@ -1,0 +1,22 @@
+#ifndef NODE_H
+#define NODE_H
+
+#include <iostream>
+#include "student.h"
+
+using namespace std;
+
+class Node
+{
+ public:
+  Node(Student* v); //Make a node pointing to a student class, next starts at nullptr
+  ~Node(); //Destructor, deletes what value is pointing to (the student class)
+  Node* getNext(); //Returns next pointer
+  Student* getStudent(); //Returns value pointer
+  void setNext(Node* n); //Sets next equal to argument
+ private:
+  Student* value;
+  Node* next;
+};
+
+#endif
