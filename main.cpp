@@ -5,17 +5,27 @@
 #include "Student.h"
 using namespace std; //imports
 
-void addNode(Student* &newStudent, Node* &firstN){ //adds a node to end of list
-	Node* current = firstN;
+void addNode(Student* &newStudent, Node* &firstN, Node* current){ //adds a node to end of list
 	if (current == NULL){//if the first node is undefined:
 		firstN = new Node(newStudent);//create a new node at the start with value newStudent
 	}
 	else{
-		
-		while (current->getNext() != NULL){//get to end of node list
-			current = current->getNext();
+		if (current->getStudent()->getID() > newStudent->getID() and current->getStudent()->getID() == firstN->getStudent()->getID()){
+			Node* StudentNode = new Node(newStudent);
+			StudentNode->setNext(firstN);
+			firstN = StudentNode;
 		}
-		current->setNext(new Node(newStudent)); //make new node at end of the list
+		else if (current->getNext() == NULL){
+			current->setNext(new Node(newStudent));
+		}
+		else if (current->getStudent()->getID() < newStudent->getID() and current->getNext()->getStudent()->getID() > newStudent->getID()){
+			Node* tempNode = current->getNext();
+			current->setNext(new Node(newStudent));
+			current->getNext()->setNext(tempNode);
+		}
+		else{
+			addNode(newStudent, firstN, current->getNext());
+		}
 	}
 }
 
@@ -59,6 +69,17 @@ void average(float sum, int numbers, Node* currentNode){
 	}
 	else{
 		average(sum + currentNode->getStudent()->getGPA(), numbers + 1, currentNode->getNext());
+	}
+}
+
+void deleteAllNodes(Node* current){//recursive function to delete all nodes in the node list
+	if (current->getNext() != NULL){
+		Node* temp = current->getNext();
+		delete current;
+		deleteAllNodes(temp);
+	}
+	else{
+		delete current;
 	}
 }
 
@@ -115,7 +136,7 @@ int main(){
 
 			Student *iStudent = new Student(iName, iID, iGPA);
 
-			addNode(iStudent, first);
+			addNode(iStudent, first, first);
 			cout << "Added student!" << endl;
 		}
 		else if (strcmp(command, quit) == 0){ //If you entered QUIT:
@@ -125,18 +146,7 @@ int main(){
 		else if (strcmp(command, print) == 0){ //If you entered PRINT:
 			printNode(first, first);
 		}
-		else if (strcmp(command, avg) == 0){ //If you entered AVERAGE: USE RECURSION
-			/*
-			current = first;
-			avgSUM = 0;
-			numOfGPA = 0;
-			while (current != NULL){
-				avgSUM += current->getStudent()->getGPA();
-				numOfGPA += 1;
-				current = current->getNext();
-			}
-			cout << "Average GPA: " << fixed << setprecision(2) << avgSUM/numOfGPA << endl;
-			*/
+		else if (strcmp(command, avg) == 0){ //If you entered AVERAGE:
 			current = first;
 			average(0, 0, current);
 		}
@@ -144,5 +154,6 @@ int main(){
 			cout << "Unrecognized input. Please try again." << endl;
 		}
 	}
+	deleteAllNodes(first); //deletes all nodes at the end to prevent memory links
 	return 0;
 }
